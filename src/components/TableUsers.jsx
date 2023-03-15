@@ -10,14 +10,18 @@ function TableUsers() {
   useEffect(() => {
     (async () => {
       try {
-        const { results } = await axiosClient.get(`?page=${page}&results=10`);
-        setUsers(results);
+        //Get 10 user from api
+        const res = await axiosClient.get(`?page=${page}&results=10`);
+        setUsers(res.data.results);
       } catch (error) {
         console.log("Failed to fetch user", error);
       }
     })();
   }, [page]);
 
+  users?.sort((a, b) => a.login.username.localeCompare(b.login.username));
+
+  //Create pagination
   let items = [];
   for (let number = 1; number <= 10; number++) {
     items.push(
@@ -26,7 +30,7 @@ function TableUsers() {
       </Pagination.Item>
     );
   }
-  console.log(users);
+
   return (
     <div className="container mt-5">
       <Table bordered hover>
@@ -38,12 +42,10 @@ function TableUsers() {
             <th>Picture</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="userTable">
           {users?.map((user, index) => (
             <tr key={user.login.uuid}>
-              <td className="align-middle text-center">
-                {page === 1 ? index + 1 : `${page * 10 + index}`}
-              </td>
+              <td className="align-middle text-center">{(page - 1) * 10 + (index + 1)}</td>
               <td className="align-middle">{`${user.name.title} ${user.name.first}  ${user.name.last}`}</td>
               <td className="align-middle">{user.login.username}</td>
               <td className="text-center align-middle">
